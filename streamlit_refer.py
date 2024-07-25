@@ -68,7 +68,7 @@ def main():
 
     if 'messages' not in st.session_state:
         st.session_state['messages'] = [{"role": "assistant",
-                                         "content": "안녕하세요! 주어진 문서에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
+                                         "content": "안녕하세요! 주어진 차량 문서에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -101,7 +101,7 @@ def main():
                             if car_info is not None:
                                 st.markdown("### 차량 정보")
                                 st.dataframe(car_info)
-                                car_number = car_info['차량번호'].values[0]
+                                car_number = car_info['사진번호'].values[0]
                                 image_path = f"images/{car_number}.png"
                                 logger.info(f"Looking for image at: {image_path}")
                                 if os.path.exists(image_path):
