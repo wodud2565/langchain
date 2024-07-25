@@ -21,11 +21,11 @@ import os
 
 def main():
     st.set_page_config(
-        page_title="DirChat",
+        page_title="자동차 챗봇",
         page_icon="\U0001F697"  # 자동차 아이콘
     )
 
-    st.title("_Private Data :red[QA Chat]_ \U0001F697")
+    st.title("_자동차 챗봇 :red[CAR BOT]_ \U0001F697")
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
