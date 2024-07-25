@@ -18,7 +18,6 @@ from langchain.memory import StreamlitChatMessageHistory
 
 import pandas as pd
 import os
-from tempfile import NamedTemporaryFile
 
 def main():
     st.set_page_config(
@@ -60,15 +59,13 @@ def main():
             for file in uploaded_files:
                 if file.name.endswith('.csv'):
                     st.session_state.car_data = pd.read_csv(file)
-                    if 'color_code' in st.session_state.car_data.columns:
-                        st.session_state.car_data = st.session_state.car_data.drop(columns=['color_code'])
 
         save_uploaded_images(uploaded_images)
         st.session_state.processComplete = True
 
     if 'messages' not in st.session_state:
         st.session_state['messages'] = [{"role": "assistant",
-                                         "content": "안녕하세요! 주어진 차량 문서에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
+                                         "content": "안녕하세요! 주어진 문서에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -101,11 +98,11 @@ def main():
                             if car_info is not None:
                                 st.markdown("### 차량 정보")
                                 st.dataframe(car_info)
-                                car_number = car_info['사진번호'].values[0]
-                                image_path = f"images/{car_number}.png"
+                                photo_number = car_info['이미지'].values[0]
+                                image_path = f"images/{photo_number}.png"
                                 logger.info(f"Looking for image at: {image_path}")
                                 if os.path.exists(image_path):
-                                    st.image(image_path, caption=f"차량 {car_number}")
+                                    st.image(image_path, caption=f"차량 {photo_number}")
                                 else:
                                     st.markdown("이미지를 찾을 수 없습니다.")
 
@@ -144,14 +141,7 @@ def get_text(docs):
             documents = loader.load_and_split()
         elif '.csv' in doc.name:
             df = pd.read_csv(file_name)
-            if 'color_code' in df.columns:
-                df = df.drop(columns=['color_code'])
-            with NamedTemporaryFile(delete=False, suffix=".csv") as temp_file:
-                df.to_csv(temp_file.name, index=False)
-                temp_file.flush()
-                loader = CSVLoader(file_path=temp_file.name)
-                documents = loader.load()
-                os.remove(temp_file.name)
+            documents = CSVLoader(file_path=file_name).load()
 
         doc_list.extend(documents)
     return doc_list
@@ -200,7 +190,6 @@ def save_uploaded_images(uploaded_images):
 def get_car_info(query):
     if st.session_state.car_data is not None:
         df = st.session_state.car_data
-        # 예를 들어, 차량 이름으로 검색하는 경우
         result = df[df.apply(lambda row: query in row.to_string(), axis=1)]
         if not result.empty:
             return result
