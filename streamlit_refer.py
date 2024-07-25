@@ -18,6 +18,7 @@ from langchain.memory import StreamlitChatMessageHistory
 
 import pandas as pd
 import os
+from io import StringIO
 
 def main():
     st.set_page_config(
@@ -67,7 +68,7 @@ def main():
 
     if 'messages' not in st.session_state:
         st.session_state['messages'] = [{"role": "assistant",
-                                         "content": "안녕하세요! 주어진 차량에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
+                                         "content": "안녕하세요! 주어진 문서에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -142,7 +143,10 @@ def get_text(docs):
             df = pd.read_csv(file_name)
             if 'color_code' in df.columns:
                 df = df.drop(columns=['color_code'])
-            documents = CSVLoader(df.to_csv(index=False)).load()
+            csv_string = df.to_csv(index=False)
+            csv_file = StringIO(csv_string)
+            loader = CSVLoader(file_path=csv_file)
+            documents = loader.load()
 
         doc_list.extend(documents)
     return doc_list
