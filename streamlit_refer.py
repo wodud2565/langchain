@@ -21,7 +21,7 @@ import os
 
 def main():
     st.set_page_config(
-        page_title="자동차 챗봇",
+        page_title="CarBot",
         page_icon="\U0001F697"  # 자동차 아이콘
     )
 
@@ -65,7 +65,7 @@ def main():
 
     if 'messages' not in st.session_state:
         st.session_state['messages'] = [{"role": "assistant",
-                                         "content": "안녕하세요! 궁금하신 차량이 있다면 차량의 이름을 입력해주세요!"}]
+                                         "content": "안녕하세요! 차량에대해 궁금하신 것이 있다면 차량의 이름을 입력해주세요!"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -105,6 +105,7 @@ def main():
                                     st.image(image_path, caption=f"차량 {photo_number}")
                                 else:
                                     st.markdown("이미지를 찾을 수 없습니다.")
+                                    logger.error(f"Image not found at: {image_path}")
 
                         with st.expander("참고 문서 확인"):
                             for doc in source_documents:
@@ -165,7 +166,7 @@ def get_vectorstore(text_chunks):
     return vectordb
 
 def get_conversation_chain(vetorestore, openai_api_key):
-    llm = ChatOpenAI(openai_api_key=openai_api_key, model_name='gpt-3.5-turbo', temperature=0)
+    llm = ChatOpenAI(openai_api_key=openai_api_key, model_name='gpt-3.5-turbo', temperature=1, max_tokens=500)
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         chain_type="stuff",
