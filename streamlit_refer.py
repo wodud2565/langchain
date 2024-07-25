@@ -98,7 +98,7 @@ def main():
                             if car_info is not None:
                                 st.markdown("### 차량 정보")
                                 st.dataframe(car_info)
-                                photo_number = car_info['이미지'].values[0]
+                                photo_number = car_info['사진번호'].values[0]
                                 image_path = f"images/{photo_number}.png"
                                 logger.info(f"Looking for image at: {image_path}")
                                 if os.path.exists(image_path):
@@ -190,7 +190,8 @@ def save_uploaded_images(uploaded_images):
 def get_car_info(query):
     if st.session_state.car_data is not None:
         df = st.session_state.car_data
-        result = df[df.apply(lambda row: query in row.to_string(), axis=1)]
+        # 쿼리를 기반으로 차량 정보를 검색합니다.
+        result = df[df.apply(lambda row: query.lower() in row.to_string().lower(), axis=1)]
         if not result.empty:
             return result
     return None
