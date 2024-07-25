@@ -68,7 +68,7 @@ def main():
 
     if 'messages' not in st.session_state:
         st.session_state['messages'] = [{"role": "assistant",
-                                         "content": "안녕하세요! 주어진 문서에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
+                                         "content": "안녕! 주어진 문서에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -105,6 +105,8 @@ def main():
                                 image_path = f"images/{car_number}.png"
                                 if os.path.exists(image_path):
                                     st.image(image_path, caption=f"차량 {car_number}")
+                                else:
+                                    st.markdown("이미지를 찾을 수 없습니다.")
 
                         with st.expander("참고 문서 확인"):
                             for doc in source_documents:
@@ -189,7 +191,8 @@ def save_uploaded_images(uploaded_images):
     if not os.path.exists("images"):
         os.makedirs("images")
     for img in uploaded_images:
-        with open(os.path.join("images", img.name), "wb") as f:
+        img_path = os.path.join("images", img.name)
+        with open(img_path, "wb") as f:
             f.write(img.getvalue())
         logger.info(f"Uploaded image {img.name}")
 
