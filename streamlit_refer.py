@@ -68,7 +68,7 @@ def main():
 
     if 'messages' not in st.session_state:
         st.session_state['messages'] = [{"role": "assistant",
-                                         "content": "안녕! 주어진 문서에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
+                                         "content": "안녕하세요! 주어진 문서에 대해 궁금하신 것이 있으면 언제든 물어봐주세요!"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -103,6 +103,7 @@ def main():
                                 st.dataframe(car_info)
                                 car_number = car_info['차량번호'].values[0]
                                 image_path = f"images/{car_number}.png"
+                                logger.info(f"Looking for image at: {image_path}")
                                 if os.path.exists(image_path):
                                     st.image(image_path, caption=f"차량 {car_number}")
                                 else:
@@ -194,7 +195,7 @@ def save_uploaded_images(uploaded_images):
         img_path = os.path.join("images", img.name)
         with open(img_path, "wb") as f:
             f.write(img.getvalue())
-        logger.info(f"Uploaded image {img.name}")
+        logger.info(f"Uploaded image {img.name} to {img_path}")
 
 def get_car_info(query):
     if st.session_state.car_data is not None:
