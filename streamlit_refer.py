@@ -18,7 +18,7 @@ from langchain.memory import StreamlitChatMessageHistory
 
 import pandas as pd
 import os
-from io import StringIO
+from tempfile import NamedTemporaryFile
 
 def main():
     st.set_page_config(
@@ -143,10 +143,12 @@ def get_text(docs):
             df = pd.read_csv(file_name)
             if 'color_code' in df.columns:
                 df = df.drop(columns=['color_code'])
-            csv_string = df.to_csv(index=False)
-            csv_file = StringIO(csv_string)
-            loader = CSVLoader(file_path=csv_file)
-            documents = loader.load()
+            with NamedTemporaryFile(delete=False, suffix=".csv") as temp_file:
+                df.to_csv(temp_file.name, index=False)
+                temp_file.flush()
+                loader = CSVLoader(file_path=temp_file.name)
+                documents = loader.load()
+                os.remove(temp_file.name)
 
         doc_list.extend(documents)
     return doc_list
