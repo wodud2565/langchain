@@ -5,9 +5,7 @@ from loguru import logger
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 
-from langchain.document_loaders import PyPDFLoader
-from langchain.document_loaders import Docx2txtLoader
-from langchain.document_loaders import UnstructuredPowerPointLoader
+from langchain.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredPowerPointLoader, CSVLoader
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
@@ -15,14 +13,14 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.vectorstores import FAISS
 
-# from streamlit_chat import message
 from langchain.callbacks import get_openai_callback
 from langchain.memory import StreamlitChatMessageHistory
 
 def main():
     st.set_page_config(
-    page_title="DirChat",
-    page_icon=":books:")
+        page_title="DirChat",
+        page_icon=":books:"
+    )
 
     st.title("_Private Data :red[QA Chat]_ :books:")
 
@@ -36,7 +34,7 @@ def main():
         st.session_state.processComplete = None
 
     with st.sidebar:
-        uploaded_files = st.file_uploader("Upload your file", type=['pdf', 'docx'], accept_multiple_files=True)
+        uploaded_files = st.file_uploader("Upload your file", type=['pdf', 'docx', 'csv'], accept_multiple_files=True)
         openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
         process = st.button("Process")
     if process:
@@ -114,6 +112,11 @@ def get_text(docs):
         elif '.pptx' in doc.name:
             loader = UnstructuredPowerPointLoader(file_name)
             documents = loader.load_and_split()
+        elif '.csv' in doc.name:
+            loader = CSVLoader(file_name)
+            documents = loader.load()
+            # CSV 파일은 텍스트 분할이 필요 없음
+            return documents
 
         doc_list.extend(documents)
     return doc_list
