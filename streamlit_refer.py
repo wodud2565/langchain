@@ -69,25 +69,28 @@ def main():
             st.markdown(query)
 
         with st.chat_message("assistant"):
-            chain = st.session_state.conversation
+            if st.session_state.conversation:
+                chain = st.session_state.conversation
 
-            with st.spinner("Thinking..."):
-                try:
-                    result = chain({"question": query})
-                    with get_openai_callback() as cb:
-                        st.session_state.chat_history = result['chat_history']
-                    response = result['answer']
-                    source_documents = result['source_documents']
+                with st.spinner("Thinking..."):
+                    try:
+                        result = chain({"question": query})
+                        with get_openai_callback() as cb:
+                            st.session_state.chat_history = result['chat_history']
+                        response = result['answer']
+                        source_documents = result['source_documents']
 
-                    st.markdown(response)
-                    with st.expander("참고 문서 확인"):
-                        for doc in source_documents:
-                            st.markdown(f"{doc.metadata['source']}", help=doc.page_content)
+                        st.markdown(response)
+                        with st.expander("참고 문서 확인"):
+                            for doc in source_documents:
+                                st.markdown(f"{doc.metadata['source']}", help=doc.page_content)
 
-                    # Add assistant message to chat history
-                    st.session_state.messages.append({"role": "assistant", "content": response})
-                except Exception as e:
-                    st.error(f"An error occurred: {e}")
+                        # Add assistant message to chat history
+                        st.session_state.messages.append({"role": "assistant", "content": response})
+                    except Exception as e:
+                        st.error(f"An error occurred: {e}")
+            else:
+                st.error("Conversation chain is not initialized. Please process the documents first.")
 
 def tiktoken_len(text):
     tokenizer = tiktoken.get_encoding("cl100k_base")
