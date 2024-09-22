@@ -19,15 +19,15 @@ from matplotlib import font_manager, rc
 
 # 한글 폰트 설정 (나눔고딕)
 def set_korean_font():
-    font_path = "NanumGothic.ttf"  # 나눔고딕 경로 설정
+    font_path = "NanumGothic.ttf"  # GitHub에서 파일을 로컬로 다운로드 받은 후 경로를 설정
     font_name = font_manager.FontProperties(fname=font_path).get_name()
     rc('font', family=font_name)
 
 set_korean_font()  # 한글 폰트 설정
 
-# CSV 파일 경로
-CSV_PATH = "cardata.csv"
-IMAGE_FOLDER_PATH = "images/"
+# CSV 파일과 이미지 파일 경로 (GitHub에 업로드된 파일을 사용할 경우, 로컬에서 다운로드 받지 않아도 됩니다.)
+CSV_PATH = "cardata.csv"  # 상대 경로로 설정
+IMAGE_FOLDER_PATH = "images/"  # 이미지 폴더 경로
 
 def main():
     st.set_page_config(
