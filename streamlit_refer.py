@@ -15,6 +15,15 @@ import pandas as pd
 import os
 from io import BytesIO
 from PIL import Image
+from matplotlib import font_manager, rc
+
+# 한글 폰트 설정 (나눔고딕)
+def set_korean_font():
+    font_path = "NanumGothic.ttf"  # 나눔고딕 경로 설정
+    font_name = font_manager.FontProperties(fname=font_path).get_name()
+    rc('font', family=font_name)
+
+set_korean_font()  # 한글 폰트 설정
 
 # CSV 파일 경로
 CSV_PATH = "cardata.csv"
