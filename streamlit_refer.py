@@ -14,13 +14,12 @@ from langchain.memory import StreamlitChatMessageHistory
 
 import pandas as pd
 import os
-import requests
 from io import BytesIO
 from PIL import Image
 
-# GitHub에 업로드된 파일의 raw URL
-CSV_URL = "https://raw.githubusercontent.com/wodud2565/langchain/main/cardata.csv"
-IMAGE_BASE_URL = "https://raw.githubusercontent.com/wodud2565/langchain/main/images/"
+# CSV 파일 경로
+CSV_PATH = "cardata.csv"
+IMAGE_FOLDER_PATH = "images/"
 
 def main():
     st.set_page_config(
@@ -49,7 +48,7 @@ def main():
     if "car_data" not in st.session_state:
         st.session_state.car_data = None
 
-    # GitHub에서 CSV 파일 로드
+    # 로컬 CSV 파일 로드
     if "car_data" not in st.session_state:
         st.session_state.car_data = load_vehicle_data()
 
@@ -99,7 +98,7 @@ def main():
                                 st.markdown("### 차량 정보")
                                 st.dataframe(car_info)
                                 photo_number = car_info['차량번호'].values[0]
-                                image_path = f"{IMAGE_BASE_URL}{photo_number}.png"
+                                image_path = os.path.join(IMAGE_FOLDER_PATH, f"{photo_number}.png")
                                 logger.info(f"Looking for image at: {image_path}")
                                 display_vehicle_image(image_path)
 
@@ -113,29 +112,27 @@ def main():
             else:
                 st.error("Conversation chain is not initialized. Please process the documents first.")
 
-# GitHub에서 차량 데이터 CSV 불러오기
+# 리포지토리에서 차량 데이터 CSV 불러오기
 def load_vehicle_data():
     try:
-        return pd.read_csv(CSV_URL)
+        data = pd.read_csv(CSV_PATH)
+        st.success("차량 데이터를 성공적으로 불러왔습니다.")
+        return data
     except Exception as e:
-        logger.error(f"Error loading vehicle data: {e}")
+        logger.error(f"차량 데이터를 불러오는 중 오류가 발생했습니다: {e}")
         return None
 
-# 차량 이미지 표시
-def display_vehicle_image(image_url):
-    try:
-        response = requests.get(image_url)
-        if response.status_code == 200:
-            img = Image.open(BytesIO(response.content))
-            st.image(img, caption=f"차량 이미지")
-        else:
-            st.error("차량 이미지를 불러올 수 없습니다.")
-    except Exception as e:
-        st.error(f"Error loading image: {e}")
+# 로컬 이미지 파일 표시
+def display_vehicle_image(image_path):
+    if os.path.exists(image_path):
+        img = Image.open(image_path)
+        st.image(img, caption=f"차량 이미지")
+    else:
+        st.error("차량 이미지를 불러올 수 없습니다.")
 
 # CSV 파일에서 텍스트 추출
 def get_text_from_csv(df):
-    csv_loader = CSVLoader(file_path=CSV_URL)
+    csv_loader = CSVLoader(file_path=CSV_PATH)
     return csv_loader.load()
 
 # 텍스트를 청크로 나누기
