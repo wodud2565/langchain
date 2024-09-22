@@ -146,28 +146,34 @@ def compare_vehicles(vehicle1, vehicle2):
     else:
         st.write("이미지를 불러오지 못했습니다.")
 
-    # 비교할 스펙 선택 (최소가격, 최대가격, 최소연비, 최대연비, 최소출력, 최대출력)
-    specs = ['최소가격', '최대가격', '최소연비', '최대연비', '최소출력', '최대출력']
-    vehicle1_specs = vehicle1_data[specs].values
-    vehicle2_specs = vehicle2_data[specs].values
+    # 비교할 스펙을 3개의 그룹으로 나누기 (최소가격, 최대가격), (최소연비, 최대연비), (최소출력, 최대출력)
+    specs_groups = [
+        ('최소가격', '최대가격'),
+        ('최소연비', '최대연비'),
+        ('최소출력', '최대출력')
+    ]
 
-    # 스펙 비교 그래프 그리기
-    fig, ax = plt.subplots()
-    index = np.arange(len(specs))
-    bar_width = 0.35
+    for specs in specs_groups:
+        vehicle1_specs = vehicle1_data[list(specs)].values
+        vehicle2_specs = vehicle2_data[list(specs)].values
+        
+        # 스펙 비교 그래프 그리기
+        fig, ax = plt.subplots()
+        index = np.arange(len(specs))
+        bar_width = 0.35
 
-    bar1 = ax.bar(index, vehicle1_specs, bar_width, label=vehicle1)
-    bar2 = ax.bar(index + bar_width, vehicle2_specs, bar_width, label=vehicle2)
+        bar1 = ax.bar(index, vehicle1_specs, bar_width, label=vehicle1)
+        bar2 = ax.bar(index + bar_width, vehicle2_specs, bar_width, label=vehicle2)
 
-    ax.set_xlabel('스펙')
-    ax.set_ylabel('값')
-    ax.set_title(f'{vehicle1} vs {vehicle2} 스펙 비교')
-    ax.set_xticks(index + bar_width / 2)
-    ax.set_xticklabels(specs)
-    ax.legend()
+        ax.set_xlabel('스펙')
+        ax.set_ylabel('값')
+        ax.set_title(f'{vehicle1} vs {vehicle2} 스펙 비교 ({specs[0]}, {specs[1]})')
+        ax.set_xticks(index + bar_width / 2)
+        ax.set_xticklabels(specs)
+        ax.legend()
 
-    # 그래프 출력
-    st.pyplot(fig)
+        # 그래프 출력
+        st.pyplot(fig)
 
 # 텍스트를 청크로 나누기
 def get_text_chunks(text):
