@@ -133,4 +133,54 @@ def display_vehicle_image(image_url):
     except Exception as e:
         st.error(f"Error loading image: {e}")
 
-# CSV 파일에서 텍
+# CSV 파일에서 텍스트 추출
+def get_text_from_csv(df):
+    csv_loader = CSVLoader(file_path=CSV_URL)
+    return csv_loader.load()
+
+# 텍스트를 청크로 나누기
+def get_text_chunks(text):
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=900,
+        chunk_overlap=100,
+        length_function=tiktoken_len
+    )
+    return text_splitter.split_documents(text)
+
+# 벡터 스토어 생성
+def get_vectorstore(text_chunks):
+    embeddings = HuggingFaceEmbeddings(
+        model_name="jhgan/ko-sroberta-multitask",
+        model_kwargs={'device': 'cpu'},
+        encode_kwargs={'normalize_embeddings': True}
+    )
+    return FAISS.from_documents(text_chunks, embeddings)
+
+# 대화 체인 생성
+def get_conversation_chain(vetorestore, openai_api_key):
+    llm = ChatOpenAI(openai_api_key=openai_api_key, model_name='gpt-3.5-turbo', temperature=1, max_tokens=500)
+    return ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        chain_type="stuff",
+        retriever=vetorestore.as_retriever(search_type='mmr', verbose=True),
+        memory=ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer'),
+        get_chat_history=lambda h: h,
+        return_source_documents=True,
+        verbose=True
+    )
+
+# 차량 정보 검색
+def get_car_info(query):
+    if st.session_state.car_data is not None:
+        df = st.session_state.car_data
+        result = df[df.apply(lambda row: query.lower() in row.to_string().lower(), axis=1)]
+        if not result.empty:
+            return result
+    return None
+
+def tiktoken_len(text):
+    tokenizer = tiktoken.get_encoding("cl100k_base")
+    return len(tokenizer.encode(text))
+
+if __name__ == '__main__':
+    main()
