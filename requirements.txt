@@ -14,3 +14,5 @@ pandas
 streamlit
 requests
 Pillow
+matplotlib
+numpy
