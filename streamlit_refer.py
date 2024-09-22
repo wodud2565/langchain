@@ -1,4 +1,6 @@
 import streamlit as st
+import matplotlib.pyplot as plt
+import numpy as np
 import tiktoken
 from loguru import logger
 from langchain.chains import ConversationalRetrievalChain
@@ -48,11 +50,18 @@ def main():
         vectorstore = get_vectorstore(text_chunks)
         st.session_state.conversation = get_conversation_chain(vectorstore, openai_api_key)
 
+    # 차량 선택 및 비교 기능 추가
+    st.markdown("## 차량 스펙 비교")
+    vehicle1 = st.selectbox("첫 번째 차량을 선택하세요:", st.session_state.car_data['이름'].unique())
+    vehicle2 = st.selectbox("두 번째 차량을 선택하세요:", st.session_state.car_data['이름'].unique())
+
+    if st.button("비교하기"):
+        compare_vehicles(vehicle1, vehicle2)
+
     # 이전 대화 출력
     if 'messages' not in st.session_state:
         st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!"}]
 
-    # 대화 기록 출력
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
@@ -95,7 +104,7 @@ def main():
             else:
                 st.error("Conversation chain is not initialized. Please process the documents first.")
 
-# CSV 파일 로드
+# CSV 파일 로드 함수
 def load_vehicle_data():
     try:
         # 파일 경로 및 존재 여부 확인
@@ -112,13 +121,53 @@ def load_vehicle_data():
         logger.error(f"차량 데이터를 불러오는 중 오류가 발생했습니다: {e}")
         return None
 
-# 이미지 파일 표시
-def display_vehicle_image(image_path):
+# 이미지 파일 로드 함수
+def load_vehicle_image(vehicle_number):
+    image_path = os.path.join(IMAGE_FOLDER_PATH, f"{vehicle_number}.png")
     if os.path.exists(image_path):
         img = Image.open(image_path)
-        st.image(img, caption=f"차량 이미지")
+        return img
     else:
-        st.error("차량 이미지를 불러올 수 없습니다.")
+        return None
+
+# 차량 비교 기능
+def compare_vehicles(vehicle1, vehicle2):
+    vehicle_data = st.session_state.car_data
+    vehicle1_data = vehicle_data[vehicle_data['이름'] == vehicle1].iloc[0]
+    vehicle2_data = vehicle_data[vehicle_data['이름'] == vehicle2].iloc[0]
+
+    # 차량 이미지 로드
+    vehicle1_img = load_vehicle_image(vehicle1_data['차량번호'])
+    vehicle2_img = load_vehicle_image(vehicle2_data['차량번호'])
+
+    # 이미지와 차량 이름 출력
+    if vehicle1_img and vehicle2_img:
+        st.image([vehicle1_img, vehicle2_img], caption=[vehicle1, vehicle2], width=300)
+    else:
+        st.write("이미지를 불러오지 못했습니다.")
+
+    # 비교할 스펙 선택 (최소가격, 최대가격, 최소연비, 최대연비, 최소출력, 최대출력)
+    specs = ['최소가격', '최대가격', '최소연비', '최대연비', '최소출력', '최대출력']
+    vehicle1_specs = vehicle1_data[specs].values
+    vehicle2_specs = vehicle2_data[specs].values
+
+    # 스펙 비교 그래프 그리기
+    fig, ax = plt.subplots()
+    index = np.arange(len(specs))
+    bar_width = 0.35
+
+    bar1 = ax.bar(index, vehicle1_specs, bar_width, label=vehicle1)
+    bar2 = ax.bar(index + bar_width, vehicle2_specs, bar_width, label=vehicle2)
+
+    ax.set_xlabel('스펙')
+    ax.set_ylabel('값')
+    ax.set_title(f'{vehicle1} vs {vehicle2} 스펙 비교')
+    ax.set_xticks(index + bar_width / 2)
+    ax.set_xticklabels(specs)
+    ax.legend()
+
+    # 그래프 출력
+    st.pyplot(fig)
 
 # 텍스트를 청크로 나누기
 def get_text_chunks(text):
