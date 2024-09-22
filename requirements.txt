@@ -11,3 +11,6 @@ loguru
 docx2txt
 langchain_community
 pandas
+streamlit
+requests
+Pillow
