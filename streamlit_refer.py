@@ -1,17 +1,14 @@
 import streamlit as st
 import tiktoken
 from loguru import logger
-
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import CSVLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.vectorstores import FAISS
 from langchain.callbacks import get_openai_callback
 from langchain.memory import StreamlitChatMessageHistory
-
 import pandas as pd
 import os
 from io import BytesIO
@@ -36,19 +33,7 @@ def main():
         st.sidebar.warning("Please provide your OpenAI API key.")
         st.stop()
 
-    if "conversation" not in st.session_state:
-        st.session_state.conversation = None
-
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = None
-
-    if "processComplete" not in st.session_state:
-        st.session_state.processComplete = None
-
-    if "car_data" not in st.session_state:
-        st.session_state.car_data = None
-
-    # 로컬 CSV 파일 로드
+    # 차량 데이터 불러오기
     if "car_data" not in st.session_state:
         st.session_state.car_data = load_vehicle_data()
 
@@ -56,13 +41,14 @@ def main():
         st.error("차량 데이터를 불러오지 못했습니다.")
         st.stop()
 
+    # 벡터 스토어 및 대화 체인 생성
     if "conversation" not in st.session_state:
-        # 벡터 스토어를 만들고 대화 체인 생성
-        files_text = get_text_from_csv(st.session_state.car_data)
+        files_text = st.session_state.car_data.to_string()  # CSV 데이터 전체를 텍스트로 변환
         text_chunks = get_text_chunks(files_text)
         vectorstore = get_vectorstore(text_chunks)
         st.session_state.conversation = get_conversation_chain(vectorstore, openai_api_key)
 
+    # 이전 대화 출력
     if 'messages' not in st.session_state:
         st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!"}]
 
@@ -81,59 +67,58 @@ def main():
         with st.chat_message("assistant"):
             if st.session_state.conversation:
                 chain = st.session_state.conversation
-                with st.spinner("Thinking..."):
+                with st.spinner("답변을 생성 중입니다..."):
                     try:
                         result = chain({"question": query})
-                        with get_openai_callback() as cb:
-                            st.session_state.chat_history = result['chat_history']
                         response = result['answer']
-                        source_documents = result['source_documents']
 
                         st.markdown(response)
 
                         # 차량 데이터에서 정보 출력
-                        if st.session_state.car_data is not None:
-                            car_info = get_car_info(query)
-                            if car_info is not None:
-                                st.markdown("### 차량 정보")
-                                st.dataframe(car_info)
-                                photo_number = car_info['차량번호'].values[0]
-                                image_path = os.path.join(IMAGE_FOLDER_PATH, f"{photo_number}.png")
-                                logger.info(f"Looking for image at: {image_path}")
-                                display_vehicle_image(image_path)
+                        car_info = get_car_info(query)
+                        if car_info is not None:
+                            st.markdown("### 차량 정보")
+                            st.dataframe(car_info)
+                            photo_number = car_info['차량번호'].values[0]
+                            image_path = os.path.join(IMAGE_FOLDER_PATH, f"{photo_number}.png")
+                            logger.info(f"Looking for image at: {image_path}")
+                            display_vehicle_image(image_path)
 
                         with st.expander("참고 문서 확인"):
-                            for doc in source_documents:
+                            for doc in result.get('source_documents', []):
                                 st.markdown(f"{doc.metadata['source']}", help=doc.page_content)
 
                         st.session_state.messages.append({"role": "assistant", "content": response})
+
                     except Exception as e:
                         st.error(f"An error occurred: {e}")
             else:
                 st.error("Conversation chain is not initialized. Please process the documents first.")
 
-# 리포지토리에서 차량 데이터 CSV 불러오기
+# CSV 파일 로드
 def load_vehicle_data():
     try:
-        data = pd.read_csv(CSV_PATH)
-        st.success("차량 데이터를 성공적으로 불러왔습니다.")
-        return data
+        # 파일 경로 및 존재 여부 확인
+        if os.path.exists(CSV_PATH):
+            st.write(f"파일 경로 확인됨: {CSV_PATH}")
+            data = pd.read_csv(CSV_PATH)
+            st.success("차량 데이터를 성공적으로 불러왔습니다.")
+            return data
+        else:
+            st.error(f"CSV 파일이 경로에 존재하지 않습니다: {CSV_PATH}")
+            return None
     except Exception as e:
+        st.error(f"차량 데이터를 불러오는 중 오류가 발생했습니다: {e}")
         logger.error(f"차량 데이터를 불러오는 중 오류가 발생했습니다: {e}")
         return None
 
-# 로컬 이미지 파일 표시
+# 이미지 파일 표시
 def display_vehicle_image(image_path):
     if os.path.exists(image_path):
         img = Image.open(image_path)
         st.image(img, caption=f"차량 이미지")
     else:
         st.error("차량 이미지를 불러올 수 없습니다.")
-
-# CSV 파일에서 텍스트 추출
-def get_text_from_csv(df):
-    csv_loader = CSVLoader(file_path=CSV_PATH)
-    return csv_loader.load()
 
 # 텍스트를 청크로 나누기
 def get_text_chunks(text):
@@ -142,7 +127,7 @@ def get_text_chunks(text):
         chunk_overlap=100,
         length_function=tiktoken_len
     )
-    return text_splitter.split_documents(text)
+    return text_splitter.split_text(text)
 
 # 벡터 스토어 생성
 def get_vectorstore(text_chunks):
@@ -151,7 +136,7 @@ def get_vectorstore(text_chunks):
         model_kwargs={'device': 'cpu'},
         encode_kwargs={'normalize_embeddings': True}
     )
-    return FAISS.from_documents(text_chunks, embeddings)
+    return FAISS.from_texts(text_chunks, embeddings)
 
 # 대화 체인 생성
 def get_conversation_chain(vetorestore, openai_api_key):
@@ -161,7 +146,6 @@ def get_conversation_chain(vetorestore, openai_api_key):
         chain_type="stuff",
         retriever=vetorestore.as_retriever(search_type='mmr', verbose=True),
         memory=ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer'),
-        get_chat_history=lambda h: h,
         return_source_documents=True,
         verbose=True
     )
@@ -175,6 +159,7 @@ def get_car_info(query):
             return result
     return None
 
+# 텍스트 토큰 길이 계산
 def tiktoken_len(text):
     tokenizer = tiktoken.get_encoding("cl100k_base")
     return len(tokenizer.encode(text))
