@@ -123,9 +123,11 @@ def main():
 # CSV 파일 로드 함수
 def load_vehicle_data():
     try:
+        # 파일 경로 및 존재 여부 확인
         if os.path.exists(CSV_PATH):
             st.write(f"파일 경로 확인됨: {CSV_PATH}")
-            data = pd.read_csv(CSV_PATH)
+            # 인코딩을 'utf-8-sig'로 설정하여 BOM 문제 해결
+            data = pd.read_csv(CSV_PATH, encoding='utf-8-sig')
             st.success("차량 데이터를 성공적으로 불러왔습니다.")
             return data
         else:
