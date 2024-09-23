@@ -19,7 +19,6 @@ from matplotlib import font_manager, rc
 
 # 한글 폰트 설정 (나눔고딕)
 def set_korean_font():
-    # 상대 경로로 폰트 경로 설정 (Streamlit 앱이 있는 폴더에 폰트 파일이 있어야 함)
     font_path = os.path.join(os.getcwd(), "NanumGothic.ttf")
     
     if os.path.exists(font_path):
@@ -30,13 +29,13 @@ def set_korean_font():
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
 
 # CSV 파일과 이미지 파일 경로 (GitHub에 업로드된 파일을 사용할 경우, 로컬에서 다운로드 받지 않아도 됩니다.)
-CSV_PATH = "cardata.csv"  # 상대 경로로 설정
-IMAGE_FOLDER_PATH = "images/"  # 이미지 폴더 경로
+CSV_PATH = "cardata.csv"
+IMAGE_FOLDER_PATH = "images/"
 
 def main():
     st.set_page_config(
         page_title="CarBot",
-        page_icon="\U0001F697"  # 자동차 아이콘
+        page_icon="\U0001F697"
     )
 
     st.title("_자동차 챗봇 :red[CAR BOT]_ \U0001F697")
@@ -44,11 +43,11 @@ def main():
     # 한글 폰트 적용
     set_korean_font()
 
-    # OpenAI API 키 입력란 추가
-    openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
-
+    # OpenAI API 키를 시크릿 또는 환경변수에서 가져오기
+    openai_api_key = st.secrets.get("openai_api_key", None)
+    
     if not openai_api_key:
-        st.sidebar.warning("Please provide your OpenAI API key.")
+        st.error("OpenAI API 키가 설정되지 않았습니다. 'Secrets'에 API 키를 저장하세요.")
         st.stop()
 
     # 차량 데이터 불러오기
@@ -76,7 +75,7 @@ def main():
 
     # 이전 대화 출력
     if 'messages' not in st.session_state:
-        st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!2"}]
+        st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
