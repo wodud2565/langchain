@@ -16,11 +16,20 @@ import os
 from io import BytesIO
 from PIL import Image
 from matplotlib import font_manager, rc, rcParams
+import shutil  # 캐시 삭제용
 
-# 한글 폰트 설정 (GitHub에 업로드한 NanumGothic.ttf 폰트 파일 경로)
+# 캐시를 삭제하는 함수
+def delete_matplotlib_cache():
+    cache_dir = os.path.expanduser("~/.cache/matplotlib")
+    if os.path.exists(cache_dir):
+        shutil.rmtree(cache_dir)
+        st.write("matplotlib 캐시를 삭제했습니다.")
+    else:
+        st.write("matplotlib 캐시를 찾지 못했습니다.")
+
+# 한글 폰트 설정 (나눔고딕)
 def set_korean_font():
-    # GitHub 레포지토리 내 폰트 경로 설정 (GitHub 레포지토리의 루트 디렉토리로 설정)
-    font_path = os.path.join(os.path.dirname(__file__), "NanumGothic.ttf")
+    font_path = os.path.join(os.getcwd(), "NanumGothic.ttf")
     
     if os.path.exists(font_path):
         font_name = font_manager.FontProperties(fname=font_path).get_name()
@@ -42,8 +51,9 @@ def main():
 
     st.title("_자동차 챗봇 :red[CAR BOT]_ \U0001F697")
 
-    # 한글 폰트 적용
-    set_korean_font()
+    # 캐시 삭제 후 한글 폰트 적용
+    delete_matplotlib_cache()  # 캐시 삭제
+    set_korean_font()          # 한글 폰트 적용
 
     # OpenAI API 키를 시크릿 또는 환경변수에서 가져오기
     openai_api_key = st.secrets.get("openai_api_key", None)
