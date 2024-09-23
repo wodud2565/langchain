@@ -27,7 +27,6 @@ def set_korean_font():
         rcParams['font.family'] = font_name
         rcParams['axes.unicode_minus'] = False  # 마이너스 기호 깨짐 방지
         rcParams['font.size'] = 12  # 폰트 크기 설정
-        # st.write(f"폰트 {font_name}가 성공적으로 적용되었습니다.")
     else:
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
 
@@ -166,29 +165,29 @@ def compare_vehicles(vehicle1, vehicle2):
 
     # 비교할 스펙을 3개의 그룹으로 나누기 (최소가격, 최대가격), (최소연비, 최대연비), (최소출력, 최대출력)
     specs_groups = [
-        ('최소가격', '최대가격'),
-        ('최소연비', '최대연비'),
-        ('최소출력', '최대출력')
+        ('최소가격', '최대가격', '가격', '만원'),
+        ('최소연비', '최대연비', '연비', 'km/L'),
+        ('최소출력', '최대출력', '출력', 'HP')
     ]
 
     for specs in specs_groups:
-        vehicle1_specs = vehicle1_data[list(specs)].values
-        vehicle2_specs = vehicle2_data[list(specs)].values
+        vehicle1_specs = vehicle1_data[list(specs[:2])].values
+        vehicle2_specs = vehicle2_data[list(specs[:2])].values
         
         # 스펙 비교 그래프 그리기
         fig, ax = plt.subplots()
-        index = np.arange(len(specs))
+        index = np.arange(len(specs[:2]))
         bar_width = 0.35
 
         bar1 = ax.bar(index, vehicle1_specs, bar_width, label=vehicle1)
         bar2 = ax.bar(index + bar_width, vehicle2_specs, bar_width, label=vehicle2)
 
         # 축과 타이틀에 한글 폰트 적용
-        ax.set_xlabel('스펙', fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
-        ax.set_ylabel('값', fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
-        ax.set_title(f'{vehicle1} vs {vehicle2} 스펙 비교', fontsize=16, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
+        ax.set_xlabel(specs[2], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
+        ax.set_ylabel(specs[3], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
+        ax.set_title(f'{vehicle1} vs {vehicle2} {specs[2]} 비교', fontsize=16, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
         ax.set_xticks(index + bar_width / 2)
-        ax.set_xticklabels(specs, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
+        ax.set_xticklabels([specs[0], specs[1]], fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
         ax.legend(prop=font_manager.FontProperties(fname="NanumGothic.ttf"))
 
         # 그래프 출력
