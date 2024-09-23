@@ -53,18 +53,23 @@ def main():
         st.error("차량 데이터를 불러오지 못했습니다.")
         st.stop()
 
-    # 브랜드 필터링 추가
-    st.markdown("### 차량 필터링")
-    brands = st.session_state.car_data['브랜드'].unique()
-    selected_brand = st.selectbox("브랜드를 선택하세요", brands)
+    # 차량1 필터링
+    st.markdown("### 차량1 필터링")
+    brands1 = st.session_state.car_data['브랜드'].unique()
+    selected_brand1 = st.selectbox("차량1의 브랜드를 선택하세요", brands1)
+    
+    # 선택된 브랜드에 따른 차량1 필터링
+    filtered_cars1 = st.session_state.car_data[st.session_state.car_data['브랜드'] == selected_brand1]
+    vehicle1 = st.selectbox("첫 번째 차량을 선택하세요:", filtered_cars1['이름'].unique())
 
-    # 선택된 브랜드에 따른 차량 필터링
-    filtered_cars = st.session_state.car_data[st.session_state.car_data['브랜드'] == selected_brand]
-
-    # 차량 선택 및 비교 기능 추가
-    st.markdown("## 차량 스펙 비교")
-    vehicle1 = st.selectbox("첫 번째 차량을 선택하세요:", filtered_cars['이름'].unique())
-    vehicle2 = st.selectbox("두 번째 차량을 선택하세요:", filtered_cars['이름'].unique())
+    # 차량2 필터링
+    st.markdown("### 차량2 필터링")
+    brands2 = st.session_state.car_data['브랜드'].unique()
+    selected_brand2 = st.selectbox("차량2의 브랜드를 선택하세요", brands2)
+    
+    # 선택된 브랜드에 따른 차량2 필터링
+    filtered_cars2 = st.session_state.car_data[st.session_state.car_data['브랜드'] == selected_brand2]
+    vehicle2 = st.selectbox("두 번째 차량을 선택하세요:", filtered_cars2['이름'].unique())
 
     if st.button("비교하기"):
         compare_vehicles(vehicle1, vehicle2)
