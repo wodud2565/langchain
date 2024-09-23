@@ -30,7 +30,7 @@ def set_korean_font():
     else:
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
 
-# CSV 파일과 이미지 파일 경로 (GitHub에 업로드된 파일을 사용할 경우, 로컬에서 다운로드 받지 않아도 됩니다.)
+# CSV 파일과 이미지 파일 경로 
 CSV_PATH = "cardata.csv"
 IMAGE_FOLDER_PATH = "images/"
 
@@ -45,6 +45,13 @@ def main():
     # 한글 폰트 적용
     set_korean_font()
 
+    # OpenAI API 키를 시크릿 또는 환경변수에서 가져오기
+    openai_api_key = st.secrets.get("openai_api_key", None)
+    
+    if not openai_api_key:
+        st.error("OpenAI API 키가 설정되지 않았습니다. 'Secrets'에 API 키를 저장하세요.")
+        st.stop()
+
     # 차량 데이터 불러오기
     if "car_data" not in st.session_state:
         st.session_state.car_data = load_vehicle_data()
@@ -53,23 +60,17 @@ def main():
         st.error("차량 데이터를 불러오지 못했습니다.")
         st.stop()
 
-    # 차량1 필터링
-    st.markdown("### 차량1 필터링")
-    brands1 = st.session_state.car_data['브랜드'].unique()
-    selected_brand1 = st.selectbox("차량1의 브랜드를 선택하세요", brands1)
-    
-    # 선택된 브랜드에 따른 차량1 필터링
-    filtered_cars1 = st.session_state.car_data[st.session_state.car_data['브랜드'] == selected_brand1]
-    vehicle1 = st.selectbox("첫 번째 차량을 선택하세요:", filtered_cars1['이름'].unique())
+    # 벡터 스토어 및 대화 체인 생성
+    if "conversation" not in st.session_state:
+        files_text = st.session_state.car_data.to_string()  # CSV 데이터 전체를 텍스트로 변환
+        text_chunks = get_text_chunks(files_text)
+        vectorstore = get_vectorstore(text_chunks)
+        st.session_state.conversation = get_conversation_chain(vectorstore, openai_api_key)
 
-    # 차량2 필터링
-    st.markdown("### 차량2 필터링")
-    brands2 = st.session_state.car_data['브랜드'].unique()
-    selected_brand2 = st.selectbox("차량2의 브랜드를 선택하세요", brands2)
-    
-    # 선택된 브랜드에 따른 차량2 필터링
-    filtered_cars2 = st.session_state.car_data[st.session_state.car_data['브랜드'] == selected_brand2]
-    vehicle2 = st.selectbox("두 번째 차량을 선택하세요:", filtered_cars2['이름'].unique())
+    # 차량 선택 및 비교 기능 추가
+    st.markdown("## 차량 스펙 비교")
+    vehicle1 = st.selectbox("첫 번째 차량을 선택하세요:", st.session_state.car_data['이름'].unique())
+    vehicle2 = st.selectbox("두 번째 차량을 선택하세요:", st.session_state.car_data['이름'].unique())
 
     if st.button("비교하기"):
         compare_vehicles(vehicle1, vehicle2)
@@ -183,7 +184,7 @@ def compare_vehicles(vehicle1, vehicle2):
 
         # 축과 타이틀에 한글 폰트 적용
         ax.set_xlabel(specs[2], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
-        ax.set_ylabel(specs[3], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"), labelpad=15, rotation=0)
+        ax.set_ylabel(specs[3], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
         ax.set_title(f'{vehicle1} vs {vehicle2} {specs[2]} 비교', fontsize=16, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
         ax.set_xticks(index + bar_width / 2)
         ax.set_xticklabels([specs[0], specs[1]], fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
@@ -255,4 +256,3 @@ def tiktoken_len(text):
 
 if __name__ == '__main__':
     main()
-
