@@ -184,7 +184,7 @@ def compare_vehicles(vehicle1, vehicle2):
 
         # 축과 타이틀에 한글 폰트 적용
         ax.set_xlabel(specs[2], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
-        ax.set_ylabel(specs[3], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"), labelpad=15, rotation=0)  # 회전 각도 설정
+        ax.set_ylabel(specs[3], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
         ax.set_title(f'{vehicle1} vs {vehicle2} {specs[2]} 비교', fontsize=16, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
         ax.set_xticks(index + bar_width / 2)
         ax.set_xticklabels([specs[0], specs[1]], fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
