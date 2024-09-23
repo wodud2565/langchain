@@ -15,7 +15,7 @@ import pandas as pd
 import os
 from io import BytesIO
 from PIL import Image
-from matplotlib import font_manager, rc
+from matplotlib import font_manager, rc, rcParams
 
 # 한글 폰트 설정 (나눔고딕)
 def set_korean_font():
@@ -23,7 +23,8 @@ def set_korean_font():
     
     if os.path.exists(font_path):
         font_name = font_manager.FontProperties(fname=font_path).get_name()
-        rc('font', family=font_name)
+        # 전역적으로 폰트 설정
+        rcParams['font.family'] = font_name
         st.write(f"폰트 {font_name}가 성공적으로 적용되었습니다.")
     else:
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
@@ -122,7 +123,6 @@ def main():
 # CSV 파일 로드 함수
 def load_vehicle_data():
     try:
-        # 파일 경로 및 존재 여부 확인
         if os.path.exists(CSV_PATH):
             st.write(f"파일 경로 확인됨: {CSV_PATH}")
             data = pd.read_csv(CSV_PATH)
@@ -167,9 +167,7 @@ def compare_vehicles(vehicle1, vehicle2):
         ('최소연비', '최대연비'),
         ('최소출력', '최대출력')
     ]
-    # 그래프에 한글 폰트를 적용
-    plt.rc('font', family='NanumGothic')
-    
+
     for specs in specs_groups:
         vehicle1_specs = vehicle1_data[list(specs)].values
         vehicle2_specs = vehicle2_data[list(specs)].values
@@ -216,7 +214,7 @@ def get_conversation_chain(vetorestore, openai_api_key):
     return ConversationalRetrievalChain.from_llm(
         llm=llm,
         chain_type="stuff",
-        retriever=vetorestore.as_retriever(search_type='mmr', verbose=True        ),
+        retriever=vetorestore.as_retriever(search_type='mmr', verbose=True),
         memory=ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer'),
         return_source_documents=True,
         verbose=True
@@ -238,4 +236,3 @@ def tiktoken_len(text):
 
 if __name__ == '__main__':
     main()
-
