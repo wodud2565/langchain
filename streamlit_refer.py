@@ -168,7 +168,9 @@ def compare_vehicles(vehicle1, vehicle2):
         ('최소연비', '최대연비'),
         ('최소출력', '최대출력')
     ]
-
+    # 그래프에 한글 폰트를 적용
+    plt.rc('font', family='NanumGothic')
+    
     for specs in specs_groups:
         vehicle1_specs = vehicle1_data[list(specs)].values
         vehicle2_specs = vehicle2_data[list(specs)].values
