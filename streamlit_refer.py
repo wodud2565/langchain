@@ -27,7 +27,7 @@ def set_korean_font():
         rcParams['font.family'] = font_name
         rcParams['axes.unicode_minus'] = False  # 마이너스 기호 깨짐 방지
         rcParams['font.size'] = 12  # 폰트 크기 설정
-        st.write(f"폰트 {font_name}가 성공적으로 적용되었습니다.")
+        # st.write(f"폰트 {font_name}가 성공적으로 적용되었습니다.")
     else:
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
 
