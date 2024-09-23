@@ -75,6 +75,7 @@ def main():
 
     if st.button("비교하기"):
         compare_vehicles(vehicle1, vehicle2)
+        compare_vehicle_contents(vehicle1, vehicle2)  # 내용 비교 기능 추가
 
     # 이전 대화 출력
     if 'messages' not in st.session_state:
@@ -192,6 +193,23 @@ def compare_vehicles(vehicle1, vehicle2):
 
         # 그래프 출력
         st.pyplot(fig)
+
+# 내용 비교 기능 추가
+def compare_vehicle_contents(vehicle1, vehicle2):
+    vehicle_data = st.session_state.car_data
+    
+    # 첫 번째 차량 내용
+    vehicle1_data = vehicle_data[vehicle_data['이름'] == vehicle1].iloc[0]
+    vehicle1_content = vehicle1_data['내용']  # '내용' 필드
+    
+    # 두 번째 차량 내용
+    vehicle2_data = vehicle_data[vehicle_data['이름'] == vehicle2].iloc[0]
+    vehicle2_content = vehicle2_data['내용']  # '내용' 필드
+    
+    # 내용 비교 결과 출력
+    st.markdown(f"### {vehicle1}와 {vehicle2}의 내용 비교")
+    st.write(f"🚗 **{vehicle1}**: {vehicle1_content}")
+    st.write(f"🚙 **{vehicle2}**: {vehicle2_content}")
 
 # 텍스트를 청크로 나누기
 def get_text_chunks(text):
