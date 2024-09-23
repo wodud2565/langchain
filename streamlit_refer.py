@@ -41,6 +41,9 @@ def main():
 
     st.title("_자동차 챗봇 :red[CAR BOT]_ \U0001F697")
 
+    # 한글 폰트 적용
+    set_korean_font()
+
     # OpenAI API 키 입력란 추가
     openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
 
@@ -73,7 +76,7 @@ def main():
 
     # 이전 대화 출력
     if 'messages' not in st.session_state:
-        st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!1"}]
+        st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!2"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
