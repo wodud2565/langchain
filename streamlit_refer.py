@@ -179,15 +179,6 @@ def compare_vehicles(vehicle1, vehicle2):
         vehicle1_specs = vehicle1_data[list(specs)].values
         vehicle2_specs = vehicle2_data[list(specs)].values
 
-
-        # 테스트 그래프 출력
-
-        fig, ax = plt.subplots()
-        ax.plot([1, 2, 3], [4, 5, 6])
-        ax.set_title("테스트 그래프")
-        st.pyplot(fig)
-
-
         # 스펙 비교 그래프 그리기
         fig, ax = plt.subplots()
         index = np.arange(len(specs))
