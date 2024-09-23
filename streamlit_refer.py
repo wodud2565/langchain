@@ -17,21 +17,25 @@ from io import BytesIO
 from PIL import Image
 from matplotlib import font_manager, rc, rcParams
 
-# 한글 폰트 설정 (나눔고딕)
+# 한글 폰트 설정 (나눔고딕 또는 다른 폰트)
 def set_korean_font():
-    font_path = os.path.join(os.getcwd(), "NanumBrush.ttf")
+    font_path = os.path.join(os.getcwd(), "NanumGothic.ttf")  # 폰트 파일 경로 확인
     
     if os.path.exists(font_path):
         font_name = font_manager.FontProperties(fname=font_path).get_name()
-        # 전역적으로 폰트 설정
+        # 전역 폰트 설정
         rcParams['font.family'] = font_name
         st.write(f"폰트 {font_name}가 성공적으로 적용되었습니다.")
     else:
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
 
+set_korean_font()
+
 # CSV 파일과 이미지 파일 경로 (GitHub에 업로드된 파일을 사용할 경우, 로컬에서 다운로드 받지 않아도 됩니다.)
 CSV_PATH = "cardata.csv"
 IMAGE_FOLDER_PATH = "images/"
+
+
 
 def main():
     st.set_page_config(
@@ -162,6 +166,13 @@ def compare_vehicles(vehicle1, vehicle2):
         st.image([vehicle1_img, vehicle2_img], caption=[vehicle1, vehicle2], width=300)
     else:
         st.write("이미지를 불러오지 못했습니다.")
+
+        # 테스트 그래프 출력
+
+fig, ax = plt.subplots()
+ax.plot([1, 2, 3], [4, 5, 6])
+ax.set_title("테스트 그래프")
+st.pyplot(fig)
 
     # 비교할 스펙을 3개의 그룹으로 나누기 (최소가격, 최대가격), (최소연비, 최대연비), (최소출력, 최대출력)
     specs_groups = [
