@@ -19,11 +19,15 @@ from matplotlib import font_manager, rc
 
 # 한글 폰트 설정 (나눔고딕)
 def set_korean_font():
-    font_path = "NanumGothic.ttf"  # GitHub에서 파일을 로컬로 다운로드 받은 후 경로를 설정
-    font_name = font_manager.FontProperties(fname=font_path).get_name()
-    rc('font', family=font_name)
-
-set_korean_font()  # 한글 폰트 설정
+    # 상대 경로로 폰트 경로 설정 (Streamlit 앱이 있는 폴더에 폰트 파일이 있어야 함)
+    font_path = os.path.join(os.getcwd(), "NanumGothic.ttf")
+    
+    if os.path.exists(font_path):
+        font_name = font_manager.FontProperties(fname=font_path).get_name()
+        rc('font', family=font_name)
+        st.write(f"폰트 {font_name}가 성공적으로 적용되었습니다.")
+    else:
+        st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
 
 # CSV 파일과 이미지 파일 경로 (GitHub에 업로드된 파일을 사용할 경우, 로컬에서 다운로드 받지 않아도 됩니다.)
 CSV_PATH = "cardata.csv"  # 상대 경로로 설정
