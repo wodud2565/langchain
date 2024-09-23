@@ -73,7 +73,7 @@ def main():
 
     # 이전 대화 출력
     if 'messages' not in st.session_state:
-        st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!"}]
+        st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!1"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
