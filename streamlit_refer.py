@@ -17,25 +17,22 @@ from io import BytesIO
 from PIL import Image
 from matplotlib import font_manager, rc, rcParams
 
-# 한글 폰트 설정 (나눔고딕 또는 다른 폰트)
+# 한글 폰트 설정 (GitHub에 업로드한 NanumGothic.ttf 폰트 파일 경로)
 def set_korean_font():
-    font_path = os.path.join(os.getcwd(), "NanumGothic.ttf")  # 폰트 파일 경로 확인
+    # GitHub 레포지토리 내 폰트 경로 설정 (GitHub 레포지토리의 루트 디렉토리로 설정)
+    font_path = os.path.join(os.path.dirname(__file__), "NanumGothic.ttf")
     
     if os.path.exists(font_path):
         font_name = font_manager.FontProperties(fname=font_path).get_name()
-        # 전역 폰트 설정
+        # 전역적으로 폰트 설정
         rcParams['font.family'] = font_name
         st.write(f"폰트 {font_name}가 성공적으로 적용되었습니다.")
     else:
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
 
-set_korean_font()
-
 # CSV 파일과 이미지 파일 경로 (GitHub에 업로드된 파일을 사용할 경우, 로컬에서 다운로드 받지 않아도 됩니다.)
 CSV_PATH = "cardata.csv"
 IMAGE_FOLDER_PATH = "images/"
-
-
 
 def main():
     st.set_page_config(
@@ -127,11 +124,9 @@ def main():
 # CSV 파일 로드 함수
 def load_vehicle_data():
     try:
-        # 파일 경로 및 존재 여부 확인
         if os.path.exists(CSV_PATH):
             st.write(f"파일 경로 확인됨: {CSV_PATH}")
-            # 인코딩을 'utf-8-sig'로 설정하여 BOM 문제 해결
-            data = pd.read_csv(CSV_PATH, encoding='utf-8')
+            data = pd.read_csv(CSV_PATH)
             st.success("차량 데이터를 성공적으로 불러왔습니다.")
             return data
         else:
@@ -167,7 +162,6 @@ def compare_vehicles(vehicle1, vehicle2):
     else:
         st.write("이미지를 불러오지 못했습니다.")
 
-
     # 비교할 스펙을 3개의 그룹으로 나누기 (최소가격, 최대가격), (최소연비, 최대연비), (최소출력, 최대출력)
     specs_groups = [
         ('최소가격', '최대가격'),
@@ -178,7 +172,7 @@ def compare_vehicles(vehicle1, vehicle2):
     for specs in specs_groups:
         vehicle1_specs = vehicle1_data[list(specs)].values
         vehicle2_specs = vehicle2_data[list(specs)].values
-
+        
         # 스펙 비교 그래프 그리기
         fig, ax = plt.subplots()
         index = np.arange(len(specs))

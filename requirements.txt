@@ -16,3 +16,8 @@ requests
 Pillow
 matplotlib
 numpy
+beautifulsoup4
+lxml
+nltk
+watchdog
+transformers
