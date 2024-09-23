@@ -30,7 +30,7 @@ def set_korean_font():
     else:
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
 
-# CSV 파일과 이미지 파일 경로 (GitHub에 업로드된 파일을 사용할 경우, 로컬에서 다운로드 받지 않아도 됩니다.)
+# CSV 파일과 이미지 파일 경로 
 CSV_PATH = "cardata.csv"
 IMAGE_FOLDER_PATH = "images/"
 
@@ -184,7 +184,7 @@ def compare_vehicles(vehicle1, vehicle2):
 
         # 축과 타이틀에 한글 폰트 적용
         ax.set_xlabel(specs[2], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
-        ax.set_ylabel(specs[3], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
+        ax.set_ylabel(specs[3], fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"), labelpad=15, rotation=0)  # 회전 각도 설정
         ax.set_title(f'{vehicle1} vs {vehicle2} {specs[2]} 비교', fontsize=16, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
         ax.set_xticks(index + bar_width / 2)
         ax.set_xticklabels([specs[0], specs[1]], fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
