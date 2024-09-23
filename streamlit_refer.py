@@ -167,12 +167,6 @@ def compare_vehicles(vehicle1, vehicle2):
     else:
         st.write("이미지를 불러오지 못했습니다.")
 
-        # 테스트 그래프 출력
-
-fig, ax = plt.subplots()
-ax.plot([1, 2, 3], [4, 5, 6])
-ax.set_title("테스트 그래프")
-st.pyplot(fig)
 
     # 비교할 스펙을 3개의 그룹으로 나누기 (최소가격, 최대가격), (최소연비, 최대연비), (최소출력, 최대출력)
     specs_groups = [
@@ -184,7 +178,16 @@ st.pyplot(fig)
     for specs in specs_groups:
         vehicle1_specs = vehicle1_data[list(specs)].values
         vehicle2_specs = vehicle2_data[list(specs)].values
-        
+
+
+        # 테스트 그래프 출력
+
+        fig, ax = plt.subplots()
+        ax.plot([1, 2, 3], [4, 5, 6])
+        ax.set_title("테스트 그래프")
+        st.pyplot(fig)
+
+
         # 스펙 비교 그래프 그리기
         fig, ax = plt.subplots()
         index = np.arange(len(specs))
