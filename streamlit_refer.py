@@ -19,7 +19,7 @@ from matplotlib import font_manager, rc, rcParams
 
 # 한글 폰트 설정 (나눔고딕)
 def set_korean_font():
-    font_path = os.path.join(os.getcwd(), "NanumGothic.ttf")
+    font_path = os.path.join(os.getcwd(), "NanumBrush.ttf")
     
     if os.path.exists(font_path):
         font_name = font_manager.FontProperties(fname=font_path).get_name()
