@@ -15,7 +15,7 @@ import pandas as pd
 import os
 from io import BytesIO
 from PIL import Image
-import matplotlib.font_manager as fm  # 폰트 캐시 재설정에 필요
+from matplotlib import font_manager, rc
 
 # 한글 폰트 설정 (나눔고딕)
 def set_korean_font():
@@ -23,14 +23,13 @@ def set_korean_font():
     font_path = os.path.join(os.getcwd(), "NanumGothic.ttf")
     
     if os.path.exists(font_path):
-        font_name = fm.FontProperties(fname=font_path).get_name()
-        fm._rebuild()  # 폰트 캐시 재설정
-        plt.rc('font', family=font_name)
+        font_name = font_manager.FontProperties(fname=font_path).get_name()
+        rc('font', family=font_name)
         st.write(f"폰트 {font_name}가 성공적으로 적용되었습니다.")
     else:
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
 
-# CSV 파일과 이미지 파일 경로
+# CSV 파일과 이미지 파일 경로 (GitHub에 업로드된 파일을 사용할 경우, 로컬에서 다운로드 받지 않아도 됩니다.)
 CSV_PATH = "cardata.csv"  # 상대 경로로 설정
 IMAGE_FOLDER_PATH = "images/"  # 이미지 폴더 경로
 
@@ -77,7 +76,7 @@ def main():
 
     # 이전 대화 출력
     if 'messages' not in st.session_state:
-        st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!"}]
+        st.session_state['messages'] = [{"role": "assistant", "content": "안녕하세요! 차량에 대해 궁금하신 것이 있으면 차량의 이름을 입력해주세요!2"}]
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -169,7 +168,6 @@ def compare_vehicles(vehicle1, vehicle2):
         ('최소연비', '최대연비'),
         ('최소출력', '최대출력')
     ]
-    
     # 그래프에 한글 폰트를 적용
     plt.rc('font', family='NanumGothic')
     
@@ -194,7 +192,8 @@ def compare_vehicles(vehicle1, vehicle2):
 
         # 그래프 출력
         st.pyplot(fig)
-        # 텍스트를 청크로 나누기
+
+# 텍스트를 청크로 나누기
 def get_text_chunks(text):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=900,
@@ -218,7 +217,7 @@ def get_conversation_chain(vetorestore, openai_api_key):
     return ConversationalRetrievalChain.from_llm(
         llm=llm,
         chain_type="stuff",
-        retriever=vetorestore.as_retriever(search_type='mmr', verbose=True),
+        retriever=vetorestore.as_retriever(search_type='mmr', verbose=True        ),
         memory=ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer'),
         return_source_documents=True,
         verbose=True
