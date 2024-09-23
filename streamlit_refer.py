@@ -12,8 +12,8 @@ def set_korean_font():
         font_name = font_manager.FontProperties(fname=font_path).get_name()
         # 전역적으로 폰트 설정
         rcParams['font.family'] = font_name
-        rcParams['font.size'] = 12  # 폰트 크기 설정
         rcParams['axes.unicode_minus'] = False  # 마이너스 기호 깨짐 방지
+        rcParams['font.size'] = 12  # 폰트 크기 설정
         st.write(f"폰트 {font_name}가 성공적으로 적용되었습니다.")
     else:
         st.error(f"폰트 파일을 찾을 수 없습니다: {font_path}")
@@ -34,12 +34,12 @@ def compare_vehicles(vehicle1, vehicle2, vehicle1_specs, vehicle2_specs):
     bar2 = ax.bar(index + bar_width, vehicle2_specs, bar_width, label=vehicle2)
 
     # 축과 타이틀에 한글 텍스트 적용
-    ax.set_xlabel('스펙', fontsize=14)
-    ax.set_ylabel('값', fontsize=14)
-    ax.set_title(f'{vehicle1} vs {vehicle2} 스펙 비교', fontsize=16)
+    ax.set_xlabel('스펙', fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
+    ax.set_ylabel('값', fontsize=14, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
+    ax.set_title(f'{vehicle1} vs {vehicle2} 스펙 비교', fontsize=16, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
     ax.set_xticks(index + bar_width / 2)
-    ax.set_xticklabels(specs)
-    ax.legend()
+    ax.set_xticklabels(specs, fontproperties=font_manager.FontProperties(fname="NanumGothic.ttf"))
+    ax.legend(prop=font_manager.FontProperties(fname="NanumGothic.ttf"))
 
     # 그래프 출력
     st.pyplot(fig)
