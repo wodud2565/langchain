@@ -112,10 +112,10 @@ def main():
                             # display_vehicle_image(image_path)
                             st.image(image_path, caption=f"차량 {photo_number}")
 
-                        with st.expander("참고 문서 확인"):
-                            for doc in result.get('source_documents', []):
-                                st.markdown(f"{doc.metadata['source']}", help=doc.page_content)
+                        else:
+                            st.markdown("이미지를 찾을 수 없습니다.")
 
+                    # 챗 히스토리에 메시지 추가
                         st.session_state.messages.append({"role": "assistant", "content": response})
 
                     except Exception as e:
