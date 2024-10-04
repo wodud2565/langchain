@@ -109,7 +109,12 @@ def main():
                             photo_number = car_info['차량번호'].values[0]
                             image_path = os.path.join(IMAGE_FOLDER_PATH, f"{photo_number}.png")
                             logger.info(f"Looking for image at: {image_path}")
-                            display_vehicle_image(image_path)
+                            # display_vehicle_image(image_path)
+                            if os.path.exists(image_path):
+                                st.image(image_path, caption=f"차량 {photo_number}")
+                            else:
+                                st.markdown("이미지를 찾을 수 없습니다.")
+                                logger.error(f"Image not found at: {image_path}")
 
                         with st.expander("참고 문서 확인"):
                             for doc in result.get('source_documents', []):
