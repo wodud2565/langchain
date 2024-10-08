@@ -107,10 +107,11 @@ def main():
                             st.markdown("### 차량 정보")
                             st.dataframe(car_info)
                             photo_number = car_info['차량번호'].values[0]
+                            car_name = car_info['이름'].values[0]
                             image_path = os.path.join(IMAGE_FOLDER_PATH, f"{photo_number}.png")
                             logger.info(f"Looking for image at: {image_path}")
                             # display_vehicle_image(image_path)
-                            st.image(image_path, caption=f"차량 {photo_number}")
+                            st.image(image_path, caption=f"차량 {car_name}")
 
                         else:
                             st.markdown("이미지를 찾을 수 없습니다.")
