@@ -127,9 +127,9 @@ def main():
 def load_vehicle_data():
     try:
         if os.path.exists(CSV_PATH):
-            st.write(f"파일 경로 확인됨: {CSV_PATH}")
+            # st.write(f"파일 경로 확인됨: {CSV_PATH}")
             data = pd.read_csv(CSV_PATH)
-            st.success("차량 데이터를 성공적으로 불러왔습니다.")
+            # st.success("차량 데이터를 성공적으로 불러왔습니다.")
             return data
         else:
             st.error(f"CSV 파일이 경로에 존재하지 않습니다: {CSV_PATH}")
