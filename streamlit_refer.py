@@ -111,7 +111,7 @@ def main():
                             image_path = os.path.join(IMAGE_FOLDER_PATH, f"{photo_number}.png")
                             logger.info(f"Looking for image at: {image_path}")
                             # display_vehicle_image(image_path)
-                            st.image(image_path, caption=f"차량 {car_name}")
+                            st.image(image_path, caption=f"{car_name}")
 
                         else:
                             st.markdown("이미지를 찾을 수 없습니다.")
